@@ -1,3 +1,5 @@
+//! Small crate to discover Prologix GPIB-ETHERNET controllers on the network
+
 use std::collections::HashSet;
 use std::time::{Duration, Instant};
 
@@ -12,6 +14,7 @@ pub enum Error {
     Io(#[from] std::io::Error),
 }
 
+/// Discover any Prologix GPIB-ETHERNET controllers on the network
 pub async fn discover(duration: Option<Duration>) -> Result<Vec<String>, Error> {
     let mut addresses = HashSet::new();
     let socket = UdpSocket::bind("0.0.0.0:0").await?;
