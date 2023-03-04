@@ -1,0 +1,20 @@
+[package]
+name = "prologix-rs"
+version = "0.1.0"
+edition = "2021"
+authors = ["Peter Simonsson <peter.simonsson@gmail.com"]
+
+[lib]
+[[example]]
+name = "discover"
+path = "examples/discover.rs"
+required-features = []
+
+[dependencies]
+rand = "0.8.5"
+thiserror = "1.0.38"
+tokio = { version = "1.26.0", features = ["net", "time"] }
+
+[dev-dependencies]
+anyhow = "1.0"
+tokio = { version = "1.26.0", features = ["net", "time", "rt-multi-thread", "macros"] }
