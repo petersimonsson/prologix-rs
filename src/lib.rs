@@ -12,7 +12,7 @@ pub enum Error {
     Io(#[from] std::io::Error),
 }
 
-pub async fn discover() -> Result<Vec<String>, Error> {
+pub async fn discover(duration: Option<Duration>) -> Result<Vec<String>, Error> {
     let mut addresses = HashSet::new();
     let socket = UdpSocket::bind("0.0.0.0:0").await?;
     socket.set_broadcast(true)?;
@@ -22,7 +22,10 @@ pub async fn discover() -> Result<Vec<String>, Error> {
         .await?;
 
     let now = Instant::now();
-    let max_duration = Duration::from_millis(500);
+    let max_duration = match duration {
+        Some(duration) => duration,
+        None => Duration::from_millis(500),
+    };
 
     while Instant::now().duration_since(now) < max_duration {
         let mut buf: Vec<u8> = vec![0; 100];
