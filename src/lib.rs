@@ -15,7 +15,7 @@ pub enum Error {
 }
 
 /// Discover any Prologix GPIB-ETHERNET controllers on the network
-pub async fn discover(duration: Option<Duration>) -> Result<Vec<String>, Error> {
+pub async fn discover(duration: Option<Duration>) -> Result<Option<Vec<String>>, Error> {
     let mut addresses = HashSet::new();
     let socket = UdpSocket::bind("0.0.0.0:0").await?;
     socket.set_broadcast(true)?;
@@ -44,7 +44,11 @@ pub async fn discover(duration: Option<Duration>) -> Result<Vec<String>, Error> 
         }
     }
 
-    Ok(addresses.into_iter().collect())
+    if addresses.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(addresses.into_iter().collect()))
+    }
 }
 
 fn build_discovery() -> Vec<u8> {
