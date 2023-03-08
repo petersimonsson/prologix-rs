@@ -13,10 +13,12 @@ use tokio::time::timeout;
 pub enum Error {
     #[error("IO failed")]
     Io(#[from] std::io::Error),
+    #[error("No controller found")]
+    NotFound,
 }
 
 /// Discover any Prologix GPIB-ETHERNET controllers on the network
-pub async fn discover(duration: Option<Duration>) -> Result<Option<Vec<IpAddr>>, Error> {
+pub async fn discover(duration: Option<Duration>) -> Result<Vec<IpAddr>, Error> {
     let mut addresses = HashSet::new();
     let socket = UdpSocket::bind("0.0.0.0:0").await?;
     socket.set_broadcast(true)?;
@@ -46,9 +48,9 @@ pub async fn discover(duration: Option<Duration>) -> Result<Option<Vec<IpAddr>>,
     }
 
     if addresses.is_empty() {
-        Ok(None)
+        Err(Error::NotFound)
     } else {
-        Ok(Some(addresses.into_iter().collect()))
+        Ok(addresses.into_iter().collect())
     }
 }
 
