@@ -1,6 +1,7 @@
 //! Small crate to discover Prologix GPIB-ETHERNET controllers on the network
 
 use std::collections::HashSet;
+use std::net::{Ipv4Addr, IpAddr};
 use std::time::{Duration, Instant};
 
 use rand::prelude::*;
@@ -15,7 +16,7 @@ pub enum Error {
 }
 
 /// Discover any Prologix GPIB-ETHERNET controllers on the network
-pub async fn discover(duration: Option<Duration>) -> Result<Option<Vec<String>>, Error> {
+pub async fn discover(duration: Option<Duration>) -> Result<Option<Vec<IpAddr>>, Error> {
     let mut addresses = HashSet::new();
     let socket = UdpSocket::bind("0.0.0.0:0").await?;
     socket.set_broadcast(true)?;
@@ -36,10 +37,10 @@ pub async fn discover(duration: Option<Duration>) -> Result<Option<Vec<String>>,
             timeout(Duration::from_millis(100), socket.recv_from(&mut buf)).await
         {
             if len >= 24 {
-                let tmp = buf[20..24].to_vec();
-                let addr: Vec<String> = tmp.iter().map(|x| format!("{}", x)).collect();
+                let tmp = &buf[20..24];
+                let host = IpAddr::V4(Ipv4Addr::new(tmp[0], tmp[1], tmp[2], tmp[3]));
 
-                addresses.insert(addr.join("."));
+                addresses.insert(host);
             }
         }
     }
