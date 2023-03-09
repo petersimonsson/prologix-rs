@@ -1,4 +1,4 @@
-//! Small crate to discover Prologix GPIB-ETHERNET controllers on the network
+//! Small crate for accessing Prologix GPIB-ETHERNET controllers
 
 use std::collections::HashSet;
 use std::net::{IpAddr, Ipv4Addr};
@@ -17,7 +17,14 @@ pub enum Error {
     NotFound,
 }
 
-/// Discover any Prologix GPIB-ETHERNET controllers on the network
+/// Discover any Prologix GPIB-ETHERNET controllers on the network.
+/// Returns a vector of IpAddr if any controllers was found. Returns a [Error::NotFound] if no
+/// controllers was found.
+///
+/// # Arguments
+///
+/// * `duration` - A optional duration for how long it should try to discover new controllers.
+///                Defaults to 500ms if set to None.
 pub async fn discover(duration: Option<Duration>) -> Result<Vec<IpAddr>, Error> {
     let mut addresses = HashSet::new();
     let socket = UdpSocket::bind("0.0.0.0:0").await?;
