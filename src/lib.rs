@@ -1,7 +1,7 @@
 //! Small crate to discover Prologix GPIB-ETHERNET controllers on the network
 
 use std::collections::HashSet;
-use std::net::{Ipv4Addr, IpAddr};
+use std::net::{IpAddr, Ipv4Addr};
 use std::time::{Duration, Instant};
 
 use rand::prelude::*;
