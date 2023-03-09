@@ -11,7 +11,7 @@ use tokio::time::timeout;
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("IO failed")]
+    #[error("Socket error")]
     Io(#[from] std::io::Error),
     #[error("No controller found")]
     NotFound,
