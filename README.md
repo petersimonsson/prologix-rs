@@ -1,4 +1,5 @@
-Small crate for discovering Prologix GPIB-ETHERNET Controllers on the network
+# Prologix-rs
+A small crate for accessing Prologix GPIB-ETHERNET Controllers
 
 ## License
 
