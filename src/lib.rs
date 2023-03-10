@@ -64,13 +64,11 @@ pub async fn discover(duration: Option<Duration>) -> Result<Vec<IpAddr>, Error> 
 fn build_discovery() -> Vec<u8> {
     const MAGIC: u8 = 0x5A;
     const IDENTIFY_CMD: u8 = 0x00;
-    let mut msg: Vec<u8> = Vec::new();
+    let mut msg: Vec<u8> = vec![MAGIC, IDENTIFY_CMD];
     let mut addr: Vec<u8> = vec![0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00];
     let mut rng = rand::thread_rng();
     let mut seq: Vec<u8> = rng.gen::<u16>().to_le_bytes().to_vec();
 
-    msg.push(MAGIC);
-    msg.push(IDENTIFY_CMD);
     msg.append(&mut seq);
     msg.append(&mut addr);
 
