@@ -306,8 +306,8 @@ impl ControllerInfo {
 }
 
 /// Discover any Prologix GPIB-ETHERNET controllers on the network.
-/// Returns a vector of IpAddr if any controllers was found. Returns a [Error::NotFound] if no
-/// controllers was found.
+/// Returns a Vec of [ControllerInfo] if any controllers was found.
+/// Returns a [Error::NotFound] if no controllers was found.
 ///
 /// # Arguments
 ///
