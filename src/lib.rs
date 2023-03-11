@@ -9,6 +9,8 @@ use thiserror::Error;
 use tokio::net::UdpSocket;
 use tokio::time::timeout;
 
+const PROLOGIX_MAGIC: u8 = 0x5A;
+
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("Socket error")]
@@ -62,17 +64,24 @@ pub async fn discover(duration: Option<Duration>) -> Result<Vec<IpAddr>, Error> 
 }
 
 fn build_discovery() -> Vec<u8> {
-    const MAGIC: u8 = 0x5A;
     const IDENTIFY_CMD: u8 = 0x00;
-    let mut msg: Vec<u8> = vec![MAGIC, IDENTIFY_CMD];
-    let mut addr: Vec<u8> = vec![0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00];
+    let mac_addr: Vec<u8> = vec![0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
     let mut rng = rand::thread_rng();
-    let mut seq: Vec<u8> = rng.gen::<u16>().to_le_bytes().to_vec();
+    let seq = rng.gen::<u16>();
 
-    msg.append(&mut seq);
-    msg.append(&mut addr);
+    build_msg_header(IDENTIFY_CMD, seq, &mac_addr)
+}
 
-    msg
+fn build_msg_header(id: u8, seq: u16, mac_addr: &[u8]) -> Vec<u8> {
+    let mut header = vec![PROLOGIX_MAGIC, id];
+    let seq = seq.to_le_bytes();
+
+    header.extend_from_slice(&seq);
+    header.extend_from_slice(mac_addr);
+    header.push(0x00);
+    header.push(0x00);
+
+    header
 }
 
 #[cfg(test)]
