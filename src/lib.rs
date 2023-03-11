@@ -1,4 +1,4 @@
-//! Small crate for accessing Prologix GPIB-ETHERNET controllers
+//! This crate can be used to discover and configure Prologix GPIB-ETHERNET controllers
 
 use core::fmt;
 use std::sync::Arc;
