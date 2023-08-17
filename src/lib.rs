@@ -150,10 +150,37 @@ impl fmt::Display for ControllerIpType {
 
 #[derive(Debug)]
 pub struct ControllerVersion {
-    pub major: u8,
-    pub minor: u8,
-    pub patch: u8,
-    pub bugfix: u8,
+    major: u8,
+    minor: u8,
+    patch: u8,
+    bugfix: u8,
+}
+
+impl ControllerVersion {
+    pub fn new(major: u8, minor: u8, patch: u8, bugfix: u8) -> Self {
+        ControllerVersion {
+            major,
+            minor,
+            patch,
+            bugfix,
+        }
+    }
+
+    pub fn major(&self) -> u8 {
+        self.major
+    }
+
+    pub fn minor(&self) -> u8 {
+        self.minor
+    }
+
+    pub fn patch(&self) -> u8 {
+        self.patch
+    }
+
+    pub fn bugfix(&self) -> u8 {
+        self.bugfix
+    }
 }
 
 impl fmt::Display for ControllerVersion {
@@ -214,24 +241,9 @@ impl ControllerInfo {
             ip_addr: IpAddr::V4(Ipv4Addr::new(msg[20], msg[21], msg[22], msg[23])),
             ip_netmask: IpAddr::V4(Ipv4Addr::new(msg[24], msg[25], msg[26], msg[27])),
             ip_gateway: IpAddr::V4(Ipv4Addr::new(msg[28], msg[29], msg[30], msg[31])),
-            app_version: ControllerVersion {
-                major: msg[32],
-                minor: msg[33],
-                patch: msg[34],
-                bugfix: msg[35],
-            },
-            boot_version: ControllerVersion {
-                major: msg[36],
-                minor: msg[37],
-                patch: msg[38],
-                bugfix: msg[39],
-            },
-            hardware_version: ControllerVersion {
-                major: msg[40],
-                minor: msg[41],
-                patch: msg[42],
-                bugfix: msg[43],
-            },
+            app_version: ControllerVersion::new(msg[32], msg[33], msg[34], msg[35]),
+            boot_version: ControllerVersion::new(msg[36], msg[37], msg[38], msg[39]),
+            hardware_version: ControllerVersion::new(msg[40], msg[41], msg[42], msg[43]),
             name: msg[44..76].to_vec(),
         })
     }
