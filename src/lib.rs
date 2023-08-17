@@ -31,8 +31,20 @@ pub struct MacAddress {
 }
 
 impl MacAddress {
+    pub fn new(addr: [u8; 6]) -> Self {
+        MacAddress { addr }
+    }
+
     pub fn addr(&self) -> &[u8] {
         &self.addr
+    }
+}
+
+impl Default for MacAddress {
+    fn default() -> Self {
+        MacAddress {
+            addr: [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF],
+        }
     }
 }
 
@@ -335,14 +347,13 @@ pub async fn discover(duration: Option<Duration>) -> Result<Vec<Arc<ControllerIn
 
 fn build_discovery() -> Vec<u8> {
     const IDENTIFY_CMD: u8 = 0x00;
-    let mac_addr: [u8; 6] = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF];
     let mut rng = rand::thread_rng();
     let seq = rng.gen::<u16>();
     let header = MsgHeader {
         magic: PROLOGIX_MAGIC,
         id: IDENTIFY_CMD,
         seq,
-        mac_addr: MacAddress { addr: mac_addr },
+        mac_addr: MacAddress::default(),
     };
 
     header.to_bytes()
