@@ -15,6 +15,8 @@ use tokio::time::timeout;
 
 const PROLOGIX_MAGIC: u8 = 0x5A;
 
+const IDENTIFY_CMD: u8 = 0x00;
+
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("Socket error")]
@@ -355,7 +357,6 @@ pub async fn discover(duration: Option<Duration>) -> Result<Vec<Arc<ControllerIn
 }
 
 fn build_discovery() -> Vec<u8> {
-    const IDENTIFY_CMD: u8 = 0x00;
     let mut rng = rand::thread_rng();
     let seq = rng.gen::<u16>();
     let header = MsgHeader::new(PROLOGIX_MAGIC, IDENTIFY_CMD, seq, MacAddress::default());
