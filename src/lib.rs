@@ -16,6 +16,7 @@ use tokio::time::timeout;
 const PROLOGIX_MAGIC: u8 = 0x5A;
 
 const IDENTIFY_CMD: u8 = 0x00;
+const REBOOT_CMD: u8 = 0x12;
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -362,6 +363,45 @@ fn build_discovery() -> Vec<u8> {
     let header = MsgHeader::new(PROLOGIX_MAGIC, IDENTIFY_CMD, seq, MacAddress::default());
 
     header.to_bytes()
+}
+
+/// Send reboot message to the Prologix GPIB-ETHERNET controller at `addr`.
+pub async fn reboot(addr: &IpAddr) -> Result<(), Error> {
+    let socket = UdpSocket::bind("0.0.0.0:0").await?;
+    socket
+        .send_to(
+            &build_reboot(&RebootType::Reset),
+            addr.to_string() + ":3040",
+        )
+        .await?;
+    Ok(())
+}
+
+pub enum RebootType {
+    Bootloader,
+    Reset,
+}
+
+impl RebootType {
+    fn to_u8(&self) -> u8 {
+        match self {
+            Self::Bootloader => 0,
+            Self::Reset => 1,
+        }
+    }
+}
+
+fn build_reboot(reboot_type: &RebootType) -> Vec<u8> {
+    let mut rng = rand::thread_rng();
+    let seq = rng.gen::<u16>();
+    let header = MsgHeader::new(PROLOGIX_MAGIC, REBOOT_CMD, seq, MacAddress::default());
+    let mut bytes = header.to_bytes();
+    bytes.push(reboot_type.to_u8());
+    bytes.push(0);
+    bytes.push(0);
+    bytes.push(0);
+
+    bytes
 }
 
 #[cfg(test)]
