@@ -66,6 +66,15 @@ pub struct MsgHeader {
 }
 
 impl MsgHeader {
+    fn new(magic: u8, id: u8, seq: u16, mac_addr: MacAddress) -> Self {
+        MsgHeader {
+            magic,
+            id,
+            seq,
+            mac_addr,
+        }
+    }
+
     fn to_bytes(&self) -> Vec<u8> {
         let mut header = vec![self.magic, self.id];
         let seq = self.seq.to_be_bytes();
@@ -349,12 +358,7 @@ fn build_discovery() -> Vec<u8> {
     const IDENTIFY_CMD: u8 = 0x00;
     let mut rng = rand::thread_rng();
     let seq = rng.gen::<u16>();
-    let header = MsgHeader {
-        magic: PROLOGIX_MAGIC,
-        id: IDENTIFY_CMD,
-        seq,
-        mac_addr: MacAddress::default(),
-    };
+    let header = MsgHeader::new(PROLOGIX_MAGIC, IDENTIFY_CMD, seq, MacAddress::default());
 
     header.to_bytes()
 }
