@@ -207,7 +207,6 @@ pub struct ControllerInfo {
     app_version: ControllerVersion,
     boot_version: ControllerVersion,
     hardware_version: ControllerVersion,
-    name: Vec<u8>,
 }
 
 impl ControllerInfo {
@@ -244,7 +243,6 @@ impl ControllerInfo {
             app_version: ControllerVersion::new(msg[32], msg[33], msg[34], msg[35]),
             boot_version: ControllerVersion::new(msg[36], msg[37], msg[38], msg[39]),
             hardware_version: ControllerVersion::new(msg[40], msg[41], msg[42], msg[43]),
-            name: msg[44..76].to_vec(),
         })
     }
 
