@@ -149,27 +149,6 @@ impl fmt::Display for ControllerIpType {
 }
 
 #[derive(Debug)]
-pub struct ControllerNetmask {
-    mask: [u8; 4],
-}
-
-impl ControllerNetmask {
-    pub fn mask(&self) -> &[u8] {
-        &self.mask
-    }
-}
-
-impl fmt::Display for ControllerNetmask {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}.{}.{}.{}",
-            self.mask[0], self.mask[1], self.mask[2], self.mask[3]
-        )
-    }
-}
-
-#[derive(Debug)]
 pub struct ControllerVersion {
     pub major: u8,
     pub minor: u8,
@@ -196,7 +175,7 @@ pub struct ControllerInfo {
     alert: ControllerAlert,
     ip_type: ControllerIpType,
     ip_addr: IpAddr,
-    ip_netmask: ControllerNetmask,
+    ip_netmask: IpAddr,
     ip_gateway: IpAddr,
     app_version: ControllerVersion,
     boot_version: ControllerVersion,
@@ -224,9 +203,6 @@ impl ControllerInfo {
         uptime_days.copy_from_slice(&msg[12..14]);
         let uptime_days = u16::from_be_bytes(uptime_days) as u64 * 24 * 3600;
 
-        let mut ip_netmask = [0u8; 4];
-        ip_netmask.copy_from_slice(&msg[24..28]);
-
         Ok(ControllerInfo {
             mac_addr: header.mac_addr,
             uptime: Duration::from_secs(
@@ -236,7 +212,7 @@ impl ControllerInfo {
             alert: ControllerAlert::from(msg[18]),
             ip_type: ControllerIpType::from(msg[19]),
             ip_addr: IpAddr::V4(Ipv4Addr::new(msg[20], msg[21], msg[22], msg[23])),
-            ip_netmask: ControllerNetmask { mask: ip_netmask },
+            ip_netmask: IpAddr::V4(Ipv4Addr::new(msg[24], msg[25], msg[26], msg[27])),
             ip_gateway: IpAddr::V4(Ipv4Addr::new(msg[28], msg[29], msg[30], msg[31])),
             app_version: ControllerVersion {
                 major: msg[32],
@@ -284,7 +260,7 @@ impl ControllerInfo {
         &self.ip_addr
     }
 
-    pub fn ip_netmask(&self) -> &ControllerNetmask {
+    pub fn ip_netmask(&self) -> &IpAddr {
         &self.ip_netmask
     }
 
