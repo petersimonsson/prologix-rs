@@ -69,9 +69,9 @@ pub struct MsgHeader {
 }
 
 impl MsgHeader {
-    fn new(magic: u8, id: u8, seq: u16, mac_addr: MacAddress) -> Self {
+    fn new(id: u8, seq: u16, mac_addr: MacAddress) -> Self {
         MsgHeader {
-            magic,
+            magic: PROLOGIX_MAGIC,
             id,
             seq,
             mac_addr,
@@ -360,7 +360,7 @@ pub async fn discover(duration: Option<Duration>) -> Result<Vec<Arc<ControllerIn
 fn build_discovery() -> Vec<u8> {
     let mut rng = rand::thread_rng();
     let seq = rng.gen::<u16>();
-    let header = MsgHeader::new(PROLOGIX_MAGIC, IDENTIFY_CMD, seq, MacAddress::default());
+    let header = MsgHeader::new(IDENTIFY_CMD, seq, MacAddress::default());
 
     header.to_bytes()
 }
@@ -394,7 +394,7 @@ impl RebootType {
 fn build_reboot(reboot_type: &RebootType) -> Vec<u8> {
     let mut rng = rand::thread_rng();
     let seq = rng.gen::<u16>();
-    let header = MsgHeader::new(PROLOGIX_MAGIC, REBOOT_CMD, seq, MacAddress::default());
+    let header = MsgHeader::new(REBOOT_CMD, seq, MacAddress::default());
     let mut bytes = header.to_bytes();
     bytes.push(reboot_type.to_u8());
     bytes.push(0);
