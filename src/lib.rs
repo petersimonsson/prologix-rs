@@ -15,9 +15,6 @@ use tokio::time::timeout;
 
 const PROLOGIX_MAGIC: u8 = 0x5A;
 
-const IDENTIFY_CMD: u8 = 0x00;
-const REBOOT_CMD: u8 = 0x12;
-
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("Socket error")]
@@ -61,25 +58,54 @@ impl fmt::Display for MacAddress {
     }
 }
 
+pub enum Command {
+    Identify,
+    IdentifyReply,
+    Reboot,
+    Unknown,
+}
+
+impl Command {
+    fn to_u8(&self) -> u8 {
+        match self {
+            Self::Identify => 0x00,
+            Self::IdentifyReply => 0x01,
+            Self::Reboot => 0x0c,
+            Self::Unknown => 0xff,
+        }
+    }
+}
+
+impl From<u8> for Command {
+    fn from(value: u8) -> Self {
+        match value {
+            0x00 => Self::Identify,
+            0x01 => Self::IdentifyReply,
+            0x0c => Self::Reboot,
+            _ => Self::Unknown,
+        }
+    }
+}
+
 pub struct MsgHeader {
     magic: u8,
-    id: u8,
+    cmd: Command,
     seq: u16,
     mac_addr: MacAddress,
 }
 
 impl MsgHeader {
-    fn new(id: u8, seq: u16, mac_addr: MacAddress) -> Self {
+    fn new(cmd: Command, seq: u16, mac_addr: MacAddress) -> Self {
         MsgHeader {
             magic: PROLOGIX_MAGIC,
-            id,
+            cmd,
             seq,
             mac_addr,
         }
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        let mut header = vec![self.magic, self.id];
+        let mut header = vec![self.magic, self.cmd.to_u8()];
         let seq = self.seq.to_be_bytes();
 
         header.extend_from_slice(&seq);
@@ -100,7 +126,7 @@ impl MsgHeader {
 
         MsgHeader {
             magic: bytes[0],
-            id: bytes[1],
+            cmd: bytes[1].into(),
             seq,
             mac_addr: MacAddress { addr: mac_addr },
         }
@@ -360,7 +386,7 @@ pub async fn discover(duration: Option<Duration>) -> Result<Vec<Arc<ControllerIn
 fn build_discovery() -> Vec<u8> {
     let mut rng = rand::thread_rng();
     let seq = rng.gen::<u16>();
-    let header = MsgHeader::new(IDENTIFY_CMD, seq, MacAddress::default());
+    let header = MsgHeader::new(Command::Identify, seq, MacAddress::default());
 
     header.to_bytes()
 }
@@ -394,7 +420,7 @@ impl RebootType {
 fn build_reboot(reboot_type: &RebootType) -> Vec<u8> {
     let mut rng = rand::thread_rng();
     let seq = rng.gen::<u16>();
-    let header = MsgHeader::new(REBOOT_CMD, seq, MacAddress::default());
+    let header = MsgHeader::new(Command::Reboot, seq, MacAddress::default());
     let mut bytes = header.to_bytes();
     bytes.push(reboot_type.to_u8());
     bytes.push(0);
