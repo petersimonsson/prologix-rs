@@ -392,13 +392,10 @@ fn build_discovery() -> Vec<u8> {
 }
 
 /// Send reboot message to the Prologix GPIB-ETHERNET controller at `addr`.
-pub async fn reboot(addr: &IpAddr) -> Result<(), Error> {
+pub async fn reboot(addr: &IpAddr, rtype: &RebootType) -> Result<(), Error> {
     let socket = UdpSocket::bind("0.0.0.0:0").await?;
     socket
-        .send_to(
-            &build_reboot(&RebootType::Reset),
-            addr.to_string() + ":3040",
-        )
+        .send_to(&build_reboot(rtype), addr.to_string() + ":3040")
         .await?;
     Ok(())
 }
