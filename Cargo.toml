@@ -17,9 +17,9 @@ required-features = []
 
 [dependencies]
 rand = "0.8.5"
-thiserror = "1.0.38"
-tokio = { version = "1.26.0", features = ["net", "time"] }
+thiserror = "1.0"
+tokio = { version = "1.36", features = ["net", "time"] }
 
 [dev-dependencies]
 anyhow = "1.0"
-tokio = { version = "1.26.0", features = ["net", "time", "rt-multi-thread", "macros"] }
+tokio = { version = "1.36", features = ["net", "time", "rt-multi-thread", "macros"] }
