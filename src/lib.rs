@@ -384,8 +384,8 @@ pub async fn discover(duration: Option<Duration>) -> Result<Vec<Arc<ControllerIn
 }
 
 fn build_discovery() -> Vec<u8> {
-    let mut rng = rand::thread_rng();
-    let seq = rng.gen::<u16>();
+    let mut rng = rand::rng();
+    let seq = rng.random::<u16>();
     let header = MsgHeader::new(Command::Identify, seq, MacAddress::default());
 
     header.to_bytes()
@@ -415,8 +415,8 @@ impl RebootType {
 }
 
 fn build_reboot(reboot_type: &RebootType) -> Vec<u8> {
-    let mut rng = rand::thread_rng();
-    let seq = rng.gen::<u16>();
+    let mut rng = rand::rng();
+    let seq = rng.random::<u16>();
     let header = MsgHeader::new(Command::Reboot, seq, MacAddress::default());
     let mut bytes = header.to_bytes();
     bytes.push(reboot_type.to_u8());
