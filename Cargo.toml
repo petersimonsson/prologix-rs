@@ -16,10 +16,10 @@ path = "examples/reboot.rs"
 required-features = []
 
 [dependencies]
-rand = "0.9.1"
+rand = "0.9.2"
 thiserror = "2.0"
-tokio = { version = "1.46", features = ["net", "time"] }
+tokio = { version = "1.47", features = ["net", "time"] }
 
 [dev-dependencies]
 anyhow = "1.0"
-tokio = { version = "1.46", features = ["net", "time", "rt-multi-thread", "macros"] }
+tokio = { version = "1.47", features = ["net", "time", "rt-multi-thread", "macros"] }
